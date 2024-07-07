@@ -114,22 +114,22 @@ class UCSAgent(Agent):
                             self.open[child.cell] = (child.cost, child.cell, child)
                         elif self.open.get(child.cell) and self.open.get(child.cell)[0]>child.cost:
                             self.open[child.cell] = (child.cost, child.cell, child)
-
             except KeyError:
                 print("No solution found.")
                 return None
-
-             
-    
-
-
-
 
 
 class WeightedAStarAgent(Agent):
     
     def __init__(self):
-        raise NotImplementedError
+        self.closed={}
+        self.open = heapdict.heapdict()
+        self.start_node = Node(None,None,0,1,None,0)
+        # self.start_node = Node(0,0,0,1,0,0)
+        self.expanded = 0
+        # self.open.append(self.start_node)
+        self.open[self.start_node.cell] = (self.start_node.cost, self.start_node.cell, self.start_node) # Each element is a tuple of (cost, state)
+        super().__init__()
 
     def search(self, env: CampusEnv, h_weight) -> Tuple[List[int], float, int]:
         raise NotImplementedError   
