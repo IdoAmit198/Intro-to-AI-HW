@@ -53,23 +53,16 @@ class Agent:
 
 class DFSGAgent(Agent):
     def __init__(self) -> None:
-        self.closed={}
-        self.open = deque()
-        self.start_node = Node(None,None,0,1,None,0)
-        # self.start_node = Node(0,0,0,1,0,0)
-        self.expanded = 0
-        self.open.append(self.start_node)
         super().__init__()
 
     def recursive_search(self) -> Tuple[List[int], float, int]:
         node = self.open.pop()
         if node.cell is not None:
             self.env.set_state(node.cell)
-        else:
-            print(f"node.cell is None.")
         self.closed[node.cell]=node.cell
         if self.env.is_final_state(node.cell):
             actions_path, total_cost = self.solution(node)
+            
             return actions_path, total_cost, self.expanded
         children = node.expend(self.env, str(type(self)))
         self.expanded += 1
@@ -86,34 +79,39 @@ class DFSGAgent(Agent):
     def search(self, env: CampusEnv) -> Tuple[List[int], float, int]:
         self.env = env
         self.env.reset()
+
+        self.closed={}
+        self.open = deque()
+        self.start_node = Node(None,None,0,1,None,0)
+        self.expanded = 0
+        self.open.append(self.start_node)
+
         return self.recursive_search()
      
 
 class UCSAgent(Agent):
   
     def __init__(self) -> None:
-        self.closed={}
-        self.open = heapdict.heapdict()
-        self.start_node = Node(None,None,0,1,None,0)
-        # self.start_node = Node(0,0,0,1,0,0)
-        self.expanded = 0
-        self.expanded_list = []
-        self.open[self.start_node.cell] = (self.start_node.cost, self.start_node.cell, self.start_node) # Each element is a tuple of (cost, state)
         super().__init__()
 
     def search(self, env: CampusEnv) -> Tuple[List[int], float, int]:
         self.env = env
         self.env.reset()
+
+        self.closed={}
+        self.open = heapdict.heapdict()
+        self.start_node = Node(None,None,0,1,None,0)
+        self.expanded = 0
+        self.expanded_list = []
+        self.open[self.start_node.cell] = (self.start_node.cost, self.start_node.cell, self.start_node) # Each element is a tuple of (cost, state)
+        
         while True:
             try:
                 node = self.open.popitem()[1][2]
                 self.closed[node.cell]=node.cell
                 if node.cell is not None:
                     self.env.set_state(node.cell)
-                else:
-                    print(f"node.cell is None.")
                 if self.env.is_final_state(node.cell):
-                    print(self.expanded_list)
                     actions_path, total_cost = self.solution(node)
                     return actions_path, total_cost, self.expanded
                 children = node.expend(self.env, str(type(self)))
@@ -140,16 +138,17 @@ def HCampus_huristic(state:int, env:CampusEnv) -> float:
 
 class WeightedAStarAgent(Agent):
     def __init__(self):
-        self.closed={}
-        self.open = heapdict.heapdict()
-        self.expanded = 0
-        self.expanded_list = []
         super().__init__()
 
     
     def search(self, env: CampusEnv, h_weight) -> Tuple[List[int], float, int]:
         self.env = env
         self.env.reset()
+        self.closed={}
+        self.open = heapdict.heapdict()
+        self.expanded_list = []
+        self.expanded = 0
+
         self.start_node = Node(None,None,0,1,HCampus_huristic(state=0, env=env),0, HCampus_huristic(state=0, env=env))   
         self.open[self.start_node.cell] = (self.start_node.f_value, self.start_node.cell, self.start_node) # Each element is a tuple of (cost, state)
         while True:
@@ -158,10 +157,7 @@ class WeightedAStarAgent(Agent):
                 self.closed[node.cell]=node.total_cost
                 if node.cell is not None:
                     self.env.set_state(node.cell)
-                else:
-                    print(f"node.cell is None.")
                 if self.env.is_final_state(node.cell):
-                    print(self.expanded_list)
                     actions_path, total_cost = self.solution(node)
                     return actions_path, total_cost, self.expanded
                 children = node.expend(self.env, str(type(self)), h_weight=h_weight)
