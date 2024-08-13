@@ -140,7 +140,6 @@ class AgentAlphaBeta(Agent):
         curr_max = -math.inf
         _, children = self.successors(env, agent_id)
         for child in children:
-            # child.apply_operator(agent_id, operator)
             curr_result = self.min_func(child, agent_id + 1, depth - 1, alpha, beta)
             curr_max = max(curr_result, curr_max)
             if curr_max >= beta:
