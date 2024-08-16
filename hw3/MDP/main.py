@@ -61,7 +61,6 @@ def adp_example_driver():
 
     sim = Simulator()
 
-    
     reward_matrix, transition_probabilities = adp_algorithm(sim,num_episodes=10)
   
     print("Reward Matrix:")
@@ -71,8 +70,43 @@ def adp_example_driver():
     for action, probs in transition_probabilities.items():
         print(f"{action}: {probs}")
 
+def adp_learner_driver():
+    sim = Simulator()
+    for num_episodes in [10, 100, 1000]:
+        mdp = MDP.load_mdp()
+        # Create a list of actions from dict keys of actions
+        actions_list = list(mdp.actions.keys())
+        reward_matrix, transition_probabilities = adp_algorithm(sim,num_episodes=num_episodes, num_rows=mdp.num_row, num_cols=mdp.num_col, actions=actions_list)
+        board = []
+        for row in reward_matrix:
+            row_string = [str(cell) if cell != 0 else "WALL" for cell in row]
+            board.append(row_string)
+        # for cell in reward_matrix.tolist():
+        #     string_cell = str(cell) if cell != 0 else "WALL"
+        #     board.append(string_cell)
+        mdp.board = board
+        mdp.transition_function = transition_probabilities
+        # mdp = MDP(board= board,
+        #           terminal_states=[(0, 3)],
+        #           transition_function=transition_probabilities,
+        #           gamma=0.9)
+        policy = [['UP', 'UP', 'UP', 0],
+              ['UP', 'WALL', 'UP', 0],
+              ['UP', 'UP', 'UP', 'UP']]
+        policy_new = policy_iteration(mdp, policy)
+        print(f"For {num_episodes} num episodes:")
+        print("Reward Matrix:")
+        print(reward_matrix)
+        
+        print("\n Transition Probabilities:")
+        for action, probs in transition_probabilities.items():
+            print(f"{action}: {probs}")
+        mdp.print_policy(policy_new)
+        print("#"*50)
+    return reward_matrix, transition_probabilities
     
 if __name__ == '__main__':
     # run our example
-    example_driver()
-    adp_example_driver()
+    # example_driver()
+    # adp_example_driver()
+    adp_learner_driver()

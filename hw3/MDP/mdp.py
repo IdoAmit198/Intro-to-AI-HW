@@ -3,6 +3,8 @@ from typing import List, Tuple, Dict, Union
 from termcolor import colored
 from enum import Enum
 
+import os
+
 class Action(Enum):
     UP = "UP"
     DOWN = "DOWN"
@@ -101,6 +103,7 @@ class MDP:
         """
         
         board_env = []
+        os.chdir('/home/ido.amit/bina/Intro-to-AI-HW/hw3/MDP')
         with open(board, 'r') as f:
             for line in f.readlines():
                 row = line[:-1].split(',')
